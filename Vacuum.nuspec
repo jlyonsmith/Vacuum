@@ -9,7 +9,7 @@
     <projectUrl>http://github.com/jlyonsmith/Vacuum</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Game content creation and compilation tools</description>
-    <releaseNotes>Version 3.0 uses TSON format content files.</releaseNotes>
+    <releaseNotes></releaseNotes>
     <copyright>Copyright (C) 2014 John Lyon-Smith</copyright>
     <tags>content game opengl sprite string monogame mono osx</tags>
   </metadata>

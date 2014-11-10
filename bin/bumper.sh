@@ -3,7 +3,7 @@ function evil_git_dirty {
   [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]] && echo "*"
 }
 
-APPNAME=HotDot
+APPNAME=Vacuum
 SCRIPTDIR=$(cd $(dirname $0); pwd -P)
 SLNDIR=$(dirname $(${SCRIPTDIR}/upfind.sh $APPNAME.sln))
 pushd $SLNDIR
