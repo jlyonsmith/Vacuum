@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6DC4FE71-7E81-4BC7-B9DD-DD6A271682CA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Vacuum</RootNamespace>
+    <AssemblyName>VacuumLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;OSX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>True</Externalconsole>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="BeforeBuild" command="/usr/bin/make" workingdir="${ProjectDir}/Resources" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>True</Externalconsole>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <DefineConstants>OSX</DefineConstants>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="BeforeBuild" command="/usr/bin/make" workingdir="${ProjectDir}/Resources" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.CSharp" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="Mono.Cairo" />
+    <Reference Include="ToolBelt">
+      <HintPath>..\packages\ToolBelt.2.0.11101.0\lib\net45\ToolBelt.dll</HintPath>
+    </Reference>
+    <Reference Include="TsonLibrary">
+      <HintPath>..\packages\TsonLibrary.1.0.11105.2\lib\net45\TsonLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Properties\" />
+    <Folder Include="Formats\" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyCollection.cs" />
+    <Compile Include="Formats\ContentFileV4.cs" />
+    <Compile Include="Formats\ContentFileException.cs" />
+    <Compile Include="Formats\ContentFileHashesFile.cs" />
+    <Compile Include="CSharpStreamWriter.cs" />
+    <Compile Include="Resources\PlayroomResources.cs" />
+    <Compile Include="VacuumTool.cs" />
+    <Compile Include="VacuumContext.cs" />
+    <Compile Include="VacuumTarget.cs" />
+    <Compile Include="ContentFilterParameterAttribute.cs" />
+    <Compile Include="IContentFilter.cs" />
+    <Compile Include="FilterExtension.cs" />
+    <Compile Include="FilterClass.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Resources\PlayroomResources.resx" />
+    <None Include="Resources\makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PlayroomResources.resources">
+      <LogicalName>Playroom.PlayroomResources.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

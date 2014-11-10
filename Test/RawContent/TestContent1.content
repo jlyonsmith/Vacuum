@@ -1,0 +1,99 @@
+Version: 4,
+
+FilterAssemblies:
+[
+	$(VacuumDir)/Vacuum.Filters.dll
+],
+
+FilterSettings:
+[
+	{
+		Name: CopyFilter,
+		Extensions: 
+		[
+		{ Inputs: [.png], Outputs: [.png] },
+		{ Inputs: [.wav], Outputs: [.wav] }
+		]
+	}
+],
+
+Properties:
+{
+	OutputDir: $(ContentFileDir)../Content 
+},
+
+Targets:
+[
+	{
+		Name:     ExamplePinboardJson,
+		Inputs:   [$(InputDir)/Example.pinboard],
+		Outputs:  [$(OutputDir)/$(TargetName).data],
+		Parameters:
+		{
+			Test: 1234
+		}
+	},
+	{
+		Name:     ExampleRectangles,
+		Inputs:   [$(InputDir)/*.pinboard],
+		Outputs:  [$(OutputDir)/$(TargetName).cs],
+		Filter: PinboardInventoryToCsFilter,
+		Parameters:
+		{
+			Namespace: Company.Products
+		}
+	},
+	{
+		Name:     ExampleResx,
+		Inputs:   [$(InputDir)/Example.resx],
+		Outputs:  [$(OutputDir)/$(TargetName).strings]
+	},
+	{
+		Name:     ExampleStrings2,
+		Inputs:   [$(InputDir)/Example.strings],
+		Outputs:  [$(OutputDir)/$(TargetName).cs, $(OutputDir)/$(TargetName).data],
+		Parameters:
+		{
+			Namespace: Company.Product
+		}
+	},
+	{
+		Name:     ExamplePngPng,
+		Inputs:   [$(InputDir)/Example.png],
+		Outputs:  [$(OutputDir)/$(TargetName).png]
+	},
+	{
+		Name:     ExampleSvgPng,
+		Inputs:   [$(InputDir)/Example.svg],
+		Outputs:  [$(OutputDir)/$(TargetName).png],
+		Parameters:
+		{
+			Width:  100,
+			Height: 100
+		}
+	},
+	{
+		Name:     ExampleSvgPinboardPng,
+		Inputs:   [$(InputDir)/Example.svg, $(InputDir)/Example.pinboard],
+		Outputs:  [$(OutputDir)/$(TargetName).png],
+		Parameters:
+		{
+			Rectangle: Thing
+		}
+	},
+	{
+		Name:     ExampleSvgPdfPngdef,
+		Inputs:   [$(InputDir)/Example.svg],
+		Outputs:  [$(OutputDir)/$(TargetName).pdf, $(OutputDir)/$(TargetName).data],
+		Parameters:
+		{ 
+			Pinboard: Example,
+			Rectangle: Screen
+		}
+	},
+	{
+		Name:     ExampleWavWav,
+		Inputs:   [$(InputDir)/Example.wav],
+		Outputs:  [$(OutputDir)/$(TargetName).wav]
+	}
+]

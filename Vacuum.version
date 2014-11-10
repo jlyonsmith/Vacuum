@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Version>
+  <Files>
+    <File>Vacuum/Properties/AssemblyInfo.cs</File>
+    <File>Test/VacuumTests/Properties/AssemblyInfo.cs</File>
+    <File>Vacuum/Properties/AssemblyInfo.cs</File>
+    <File>Filters/Properties/AssemblyInfo.cs</File>
+  </Files>
+  <Major>3</Major>
+  <Minor>0</Minor>
+  <Build>11101</Build>
+  <Revision>0</Revision>
+  <StartYear>2014</StartYear>
+</Version>
