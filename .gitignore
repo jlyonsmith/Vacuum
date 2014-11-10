@@ -13,6 +13,7 @@ UpgradeLog.xml
 *.orig
 *.pidb
 *.userprefs
+*.nupkg
 
 Test/Content/
 Scratch/
