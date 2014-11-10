@@ -1,0 +1,47 @@
+﻿Version: 4,
+
+FilterAssemblies: 
+[ 
+    $(VacuumDir)/Vacuum.Filters.dll 
+],
+
+FilterSettings: 
+[
+    {
+        Name:  Vacuum.CopyFilter,
+        Extensions:
+            [ { Inputs: [.txt], Outputs: [.txt] } ]
+    }
+],
+
+Properties: 
+{
+    Example: 123
+},
+
+Targets: 
+[
+  {
+    Name:    T4,
+    Inputs:  [$(OutputDir)/F2.txt],
+    Outputs: [$(OutputDir)/F5.txt]
+  },
+
+  {
+    Name:    T3,
+    Inputs:  [$(OutputDir)/F3.txt],
+    Outputs: [$(OutputDir)/F4.txt]
+  },
+
+  {
+    Name:    T2,
+    Inputs:  [$(OutputDir)/F2.txt],
+    Outputs: [$(OutputDir)/F3.txt]
+  },
+
+  {
+    Name:    T1,
+    Inputs:  [$(InputDir)/F1.txt],
+    Outputs: [$(OutputDir)/F2.txt]
+  }
+]

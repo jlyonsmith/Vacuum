@@ -178,7 +178,7 @@ namespace Vacuum
 			Assembly assem = this.GetType().Assembly;
 			
 			// Load the resource using a namespace
-			using (StreamReader reader = new StreamReader(assem.GetManifestResourceStream(this.GetType(), "Template.content")))
+            using (StreamReader reader = new StreamReader(assem.GetManifestResourceStream("Vacuum.Resources.Template.content")))
 			{
 				File.WriteAllText(this.ContentPath, reader.ReadToEnd());
 			}

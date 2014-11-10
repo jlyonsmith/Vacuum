@@ -89,5 +89,6 @@
     <EmbeddedResource Include="Resources\PlayroomResources.resources">
       <LogicalName>Playroom.PlayroomResources.resources</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Template.content" />
   </ItemGroup>
 </Project>
