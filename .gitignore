@@ -2,6 +2,7 @@
 thumbs.db
 UpgradeLog.xml
 
+*.gz
 *.suo
 *.user
 *.cache

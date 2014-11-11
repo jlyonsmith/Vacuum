@@ -6,6 +6,7 @@
     <File>Vacuum/Properties/AssemblyInfo.cs</File>
     <File>Vacuum.Filters/Properties/AssemblyInfo.cs</File>
     <File>Vacuum.nuspec</File>
+    <File>makefile</File>
     <File>Scratch/Vacuum.version.txt</File>
   </Files>
   <Major>3</Major>
