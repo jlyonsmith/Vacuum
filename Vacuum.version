@@ -8,9 +8,9 @@
     <File>Vacuum.nuspec</File>
     <File>Scratch/Vacuum.version.txt</File>
   </Files>
-  <Major>1</Major>
+  <Major>3</Major>
   <Minor>0</Minor>
-  <Build>11110</Build>
+  <Build>0</Build>
   <Revision>0</Revision>
   <StartYear>2014</StartYear>
 </Version>
