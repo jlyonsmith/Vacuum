@@ -14,8 +14,12 @@
     <tags>content game opengl sprite string monogame mono osx</tags>
   </metadata>
   <files>
-    <file src="Vacuum/bin/Release/VacuumLibrary.dll" target="lib/net45" /> 
-    <file src="Vacuum/bin/Release/Vacuum.Filters.dll" target="lib/net45" /> 
-    <file src="Vacuum/bin/Release/Vacuum.exe" target="lib/net45" /> 
+    <file src="Vacuum/bin/Release/Vacuum.exe" /> 
+    <file src="Vacuum/bin/Release/Vacuum.exe.config" /> 
+    <file src="Vacuum/bin/Release/VacuumLibrary.dll" /> 
+    <file src="Vacuum/bin/Release/Vacuum.Filters.dll" /> 
+    <file src="Vacuum/bin/Release/MsgPack.dll" /> 
+    <file src="Vacuum/bin/Release/TsonLibrary.dll" /> 
+    <file src="Vacuum/bin/Release/ToolBelt.dll" /> 
   </files>
 </package>
