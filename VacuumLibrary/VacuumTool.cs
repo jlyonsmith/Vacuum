@@ -467,15 +467,24 @@ namespace Vacuum
     				
     				object obj = null;
 
-    				if (propertyInfo.PropertyType == typeof(double))
-    				{
+                    if (propertyInfo.PropertyType == typeof(double))
+                    {
                         var numberNode = valueNode as TsonNumberNode;
 
                         if (numberNode == null)
                             throw new ContentFileException(valueNode, "TSON node for '{0}' is not a number".CultureFormat(keyNode.Value));
 
                         obj = numberNode.Value;
-    				}
+                    }
+                    else if (propertyInfo.PropertyType == typeof(int))
+                    {
+                        var numberNode = valueNode as TsonNumberNode;
+
+                        if (numberNode == null)
+                            throw new ContentFileException(valueNode, "TSON node for '{0}' is not a number".CultureFormat(keyNode.Value));
+
+                        obj = (object)(int)numberNode.Value;
+                    }
                     else if (propertyInfo.PropertyType == typeof(string))
                     {
                         var numberNode = valueNode as TsonStringNode;
@@ -493,7 +502,7 @@ namespace Vacuum
     				{
     					throw new ContentFileException(
     						parameterNode, 
-                            "Setting '{0}' parameter for compiler '{1}' must be bool, double or string".CultureFormat(keyNode.Value, compilerName));
+                            "Setting '{0}' parameter for compiler '{1}' must be bool, int, double or string".CultureFormat(keyNode.Value, compilerName));
     				}
     				
     				try
@@ -566,7 +575,7 @@ namespace Vacuum
 					continue;
 
 				FilterClass filterClass = buildTarget.FilterClass;
-				string msg = String.Format("Building target '{0}' with '{1}' compiler", buildTarget.Name, filterClass.Name);
+				string msg = String.Format("Vacuuming target '{0}' with '{1}' compiler", buildTarget.Name, filterClass.Name);
 
 				foreach (var input in buildTarget.InputPaths)
 				{

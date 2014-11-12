@@ -18,10 +18,10 @@ namespace Vacuum.Filters
 		#endregion 
 
 		#region Properties
-		[ContentFilterParameterAttribute("Rectangle name to use to size the bitmap", Optional = false)]
-		public string Rectangle { get; set; }
+		[ContentFilterParameter("List of rectangle names to use to size the SVG files", Optional = false)]
+		public string Rectangles { get; set; }
 
-		[ContentFilterParameterAttribute("Rotation to apply to the bitmap.  Can be None, Left, Right or UpsideDown", Optional = true)]
+		[ContentFilterParameter("Rotation to apply to the bitmap.  Can be None, Left, Right or UpsideDown", Optional = true)]
 		public string Rotation { get; set; }
 		#endregion
 
@@ -45,7 +45,7 @@ namespace Vacuum.Filters
 			ParsedPath pngPath = Target.OutputPaths.Where(f => f.Extension == ".png").First();
 			PinboardFileV1 pinboardFile = PinboardFileCache.Load(pinboardPath);
 			List<ImagePlacement> placements = new List<ImagePlacement>();
-			string[] rectangleNames = this.Rectangle.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            string[] rectangleNames = this.Rectangles.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
 
 			if (svgPaths.Count() != rectangleNames.Length)
 				throw new ContentFileException("Number of .svg files ({0}) does match number of RectangleNames ({1})"

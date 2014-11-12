@@ -28,16 +28,16 @@ namespace Vacuum.Filters
 		#endregion 
 
 		#region Properties
-		[ContentFilterParameterAttribute("Number of rows of images. Used for compound images.", Optional = true)]
+		[ContentFilterParameter("Number of rows of images. Used for compound images.", Optional = true)]
 		public int Rows { get; set; }
 		
-		[ContentFilterParameterAttribute("Number of columns of images.  Used for compound images", Optional = true)]
+		[ContentFilterParameter("Number of columns of images.  Used for compound images", Optional = true)]
 		public int Columns { get; set; }
 		
-		[ContentFilterParameterAttribute("Name of the pinboard to use for the rectangle")]
+		[ContentFilterParameter("Name of the pinboard to use for the rectangle")]
 		public string Pinboard { get; set; }
 		
-		[ContentFilterParameterAttribute("Name of the rectangle to use to size the image")]
+		[ContentFilterParameter("Name of the rectangle to use to size the image")]
 		public string Rectangle { get; set; }
 
 		#endregion
@@ -60,7 +60,7 @@ namespace Vacuum.Filters
 				if (svgPaths.Count() > 1)
 				{
 					nUpSvgPath = pdfPath.WithFileAndExtension(
-						String.Format("{0}_{1}x{2}.svg", pdfPath.File, Rows, Columns));
+                        String.Format("{0}_{1}x{2}.svg", pdfPath.File, Rows, Columns));
 
 					CreateNupSvg(svgPaths, nUpSvgPath, Rows, Columns);
 				}

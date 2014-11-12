@@ -37,10 +37,10 @@ namespace Vacuum.Filters
 		#endregion 
 
 		#region Properties
-		[ContentFilterParameterAttribute("Class name for the generated C# file.  Xxx will be replaced with the base file name of the input strings file.", Optional = true)]
+		[ContentFilterParameter("Class name for the generated C# file.  Xxx will be replaced with the base file name of the input strings file.", Optional = true)]
 		public string ClassName { get; set; }
 
-		[ContentFilterParameterAttribute("Namespace for the generated C# file.", Optional = false)]
+		[ContentFilterParameter("Namespace for the generated C# file.", Optional = false)]
 		public string Namespace { get; set; }
 		#endregion
 

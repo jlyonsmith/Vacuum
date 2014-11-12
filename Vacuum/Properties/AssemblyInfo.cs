@@ -3,10 +3,10 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Vacuum")]
-[assembly: AssemblyDescription("Build Content Tool")]
+[assembly: AssemblyDescription("A tool for filtering and processing multimedia content for games and other applications.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Vacuum Content Build Tools")]
+[assembly: AssemblyProduct("Vacuum Content Filtering Tool")]
 [assembly: AssemblyCopyright("Copyright (c) 2014, Jamoki LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -23,13 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Commandlineparameters>build ~/Projects/Jamoki/Playroom/Test/RawContent/TestContent1.content -p:ProjectDir=.\;OutputDir=./Content</Commandlineparameters>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="BeforeExecute" command="/bin/bash copyExtraFiles.sh" workingdir="${ProjectDir}" />
-      </CustomCommands>
-    </CustomCommands>
-    <ConsolePause>False</ConsolePause>
+    <Commandlineparameters>filter ~/Projects/Jamoki/Spider/Spider/RawContent/Spider.iOS.content -p:ProjectDir=~/Projects/Jamoki/Spider/Spider;OutputDir=~/Projects/Jamoki/Spider/Spider/Content</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -41,22 +35,17 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Commandlineparameters>build ~/Projects/Spider/Spider/RawContent/Spider.iOS.content -p:OutputDir=~/Projects/Spider/Spider/Content</Commandlineparameters>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="BeforeExecute" />
-      </CustomCommands>
-    </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
-    <Reference Include="ToolBelt">
-      <HintPath>..\packages\ToolBelt.2.0.11101.0\lib\net45\ToolBelt.dll</HintPath>
-    </Reference>
     <Reference Include="MsgPack">
       <HintPath>..\packages\MsgPack.Cli.0.5.5\lib\net45\MsgPack.dll</HintPath>
+    </Reference>
+    <Reference Include="ToolBelt">
+      <HintPath>..\packages\ToolBelt.3.0.11109.0\lib\net45\ToolBelt.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

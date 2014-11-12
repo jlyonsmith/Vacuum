@@ -52,10 +52,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="Mono.Cairo" />
     <Reference Include="ToolBelt">
-      <HintPath>..\packages\ToolBelt.2.0.11101.0\lib\net45\ToolBelt.dll</HintPath>
+      <HintPath>..\packages\ToolBelt.3.0.11109.0\lib\net45\ToolBelt.dll</HintPath>
     </Reference>
     <Reference Include="TsonLibrary">
-      <HintPath>..\packages\TsonLibrary.1.0.11105.2\lib\net45\TsonLibrary.dll</HintPath>
+      <HintPath>..\packages\TsonLibrary.1.1.11111.0\lib\net45\TsonLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -71,7 +71,6 @@
     <Compile Include="Formats\ContentFileException.cs" />
     <Compile Include="Formats\ContentFileHashesFile.cs" />
     <Compile Include="CSharpStreamWriter.cs" />
-    <Compile Include="Resources\PlayroomResources.cs" />
     <Compile Include="VacuumTool.cs" />
     <Compile Include="VacuumContext.cs" />
     <Compile Include="VacuumTarget.cs" />
@@ -79,16 +78,17 @@
     <Compile Include="IContentFilter.cs" />
     <Compile Include="FilterExtension.cs" />
     <Compile Include="FilterClass.cs" />
+    <Compile Include="Resources\VacuumResources.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Resources\PlayroomResources.resx" />
     <None Include="Resources\makefile" />
+    <None Include="Resources\VacuumResources.resx" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\PlayroomResources.resources">
+    <EmbeddedResource Include="Resources\Template.content" />
+    <EmbeddedResource Include="Resources\VacuumResources.resources">
       <LogicalName>Playroom.PlayroomResources.resources</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Template.content" />
   </ItemGroup>
 </Project>

@@ -38,22 +38,18 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="ToolBelt">
-      <HintPath>..\packages\ToolBelt.2.0.11101.0\lib\net45\ToolBelt.dll</HintPath>
-    </Reference>
-    <Reference Include="TsonLibrary">
-      <HintPath>..\packages\TsonLibrary.1.0.11105.2\lib\net45\TsonLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="MsgPack">
       <HintPath>..\packages\MsgPack.Cli.0.5.5\lib\net45\MsgPack.dll</HintPath>
     </Reference>
+    <Reference Include="ToolBelt">
+      <HintPath>..\packages\ToolBelt.3.0.11109.0\lib\net45\ToolBelt.dll</HintPath>
+    </Reference>
+    <Reference Include="TsonLibrary">
+      <HintPath>..\packages\TsonLibrary.1.1.11111.0\lib\net45\TsonLibrary.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PinboardInventoryToCsCompiler.cs" />
     <Compile Include="PinboardFileCache.cs" />
-    <Compile Include="ResxToStringsCompiler.cs" />
-    <Compile Include="SvgAndPinboardToPngCompiler.cs" />
-    <Compile Include="SvgToPngCompiler.cs" />
     <Compile Include="ToolPaths.cs" />
     <Compile Include="Formats\PinboardFileReaderV1.cs" />
     <Compile Include="Formats\PinboardFileV1.cs" />
@@ -66,9 +62,13 @@
     <Compile Include="Formats\CsFileWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CopyCompiler.cs" />
-    <Compile Include="StringsToDataAndCsCompiler.cs" />
-    <Compile Include="PinboardToDataCompiler.cs" />
-    <Compile Include="SvgToPdfAndDataCompiler.cs" />
+    <Compile Include="PinboardInventoryToCsFilter.cs" />
+    <Compile Include="PinboardToDataFilter.cs" />
+    <Compile Include="ResxToStringsFilter.cs" />
+    <Compile Include="StringsToDataAndCsFilter.cs" />
+    <Compile Include="SvgAndPinboardToPngFilter.cs" />
+    <Compile Include="SvgToPdfAndDataFilter.cs" />
+    <Compile Include="SvgToPngFilter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

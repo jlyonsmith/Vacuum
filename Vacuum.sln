@@ -61,7 +61,7 @@ Global
 		{82172AA6-70B0-4AE7-B1E8-73DBAC543628} = {6BE02424-B483-44A3-8C1A-9819FC704D0B}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = VacuumLibrary\VacuumLibrary.csproj
+		StartupItem = Vacuum\Vacuum.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None

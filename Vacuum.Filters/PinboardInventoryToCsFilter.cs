@@ -51,7 +51,7 @@ namespace Vacuum.Filters
 		#endregion
         
 		#region Properties
-		[ContentFilterParameterAttribute("Namespace for the generated C# file", Optional = false)]
+		[ContentFilterParameter("Namespace for the generated C# file", Optional = false)]
 		public string Namespace { get; set; }
 
 		#endregion

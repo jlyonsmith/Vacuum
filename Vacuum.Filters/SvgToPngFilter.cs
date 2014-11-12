@@ -23,10 +23,10 @@ namespace Vacuum.Filters
 		#endregion 
 		
 		#region Properties
-		[ContentFilterParameterAttribute("Width of the bitmap in pixels", Optional = false)]
+		[ContentFilterParameter("Width of the bitmap in pixels", Optional = false)]
 		public double Width { get; set; }
 		
-		[ContentFilterParameterAttribute("Height of the bitmap in pixels", Optional = false)]
+		[ContentFilterParameter("Height of the bitmap in pixels", Optional = false)]
 		public double Height { get; set; }
 		#endregion
 		
