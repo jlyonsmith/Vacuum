@@ -8,11 +8,21 @@ using System.Collections;
 using System.ComponentModel.Design;
 using System.Xml;
 using Vacuum;
+using TsonLibrary;
+using System.IO;
 
 namespace Vacuum.Filters
 {
-    public class ResxToStringsFilter : IContentFilter
+    public class ResxToStringsFilter : FilterBase
     {
+        public ResxToStringsFilter()
+        {
+            this.Extensions = new FilterExtension[]
+            {
+                new FilterExtension(".resx", ".strings")
+            };
+        }
+
 		#region Classes
 		private class ResourceItem
 		{
@@ -67,49 +77,24 @@ namespace Vacuum.Filters
 
 		#endregion
 
-		#region Fields
-		private FilterExtension[] extensions = new FilterExtension[]
-		{
-			new FilterExtension(".resx", ".strings")
-		};
-		#endregion
+        #region IFilter
 
-        #region IContentFilter Members
-
-		public IList<FilterExtension> Extensions { get { return extensions; } }
-		public VacuumContext Context { get; set; } 
-        public VacuumTarget Target { get; set; }
-
-		public void Compile()
+        public override void Filter()
         {
-            ParsedPath resxPath = Target.InputPaths.Where(f => f.Extension == ".resx").First();
-            ParsedPath stringsPath = Target.OutputPaths.Where(f => f.Extension == ".strings").First();
-			List<ResourceItem> resources = ReadResources(resxPath);
-            XmlWriterSettings xmlSettings = new XmlWriterSettings();
+            var resxPath = Target.InputPaths.Where(f => f.Extension == ".resx").First();
+            var stringsPath = Target.OutputPaths.Where(f => f.Extension == ".strings").First();
+			var resources = ReadResources(resxPath);
+            var node = new TsonObjectNode();
 
-            xmlSettings.Indent = true;
-            xmlSettings.IndentChars = "\t";
-
-            using (XmlWriter xmlWriter = XmlWriter.Create(stringsPath, xmlSettings))
+            foreach (ResourceItem resource in resources)
             {
-                xmlWriter.WriteStartDocument();
-                xmlWriter.WriteStartElement("Strings");
-
-                foreach (ResourceItem resource in resources)
+                if (resource.DataType == typeof(string))
                 {
-                    if (resource.DataType == typeof(string))
-                    {
-                        string value = resource.ValueString;
-
-                        xmlWriter.WriteStartElement("String");
-                        xmlWriter.WriteAttributeString("Name", resource.Name);
-                        xmlWriter.WriteString(value);
-                        xmlWriter.WriteEndElement();
-                    }
+                    node.Add(resource.Name, resource.ValueString);
                 }
-
-                xmlWriter.WriteEndElement();
             }
+
+            File.WriteAllText(stringsPath, Tson.Format(node, TsonFormatStyle.Pretty));
         }
 
 		private List<ResourceItem> ReadResources(string resxFileName)

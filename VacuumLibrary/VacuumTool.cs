@@ -22,7 +22,7 @@ namespace Vacuum
 	public class VacuumTool : ToolBase
 	{
 		#region Fields
-		private VacuumContext vacuumContext = null;
+		private VacuumContext context = null;
 
         #endregion
 
@@ -66,7 +66,7 @@ namespace Vacuum
 			try
 			{
 				if (!NoLogo)
-					Console.WriteLine(Parser.LogoBanner);
+					WriteMessage(Parser.LogoBanner);
 				
 				bool hasContentFile = !String.IsNullOrEmpty(ContentPath);
 
@@ -100,9 +100,9 @@ namespace Vacuum
 					return;
 				}
 				
-				vacuumContext = new VacuumContext(this.Properties, this.ContentPath);
+				context = new VacuumContext(this.Properties, this.ContentPath);
 
-				ApplyFilterSettingsExtensions();
+				ApplyFilterSettings();
 
 				if (this.Command == "help")
 				{
@@ -127,7 +127,7 @@ namespace Vacuum
 			}
 			catch (Exception e)
 			{
-                TextLocation? mark = null;
+                TextLocation? location = null;
 
 				do
 				{
@@ -137,28 +137,27 @@ namespace Vacuum
 
                     if (cfe != null)
                     {
-                        mark = cfe.ErrorLocation;
+                        location = cfe.ErrorLocation;
                     } 
                     else if (tpe != null)
                     {
-                        mark = tpe.ErrorLocation;
+                        location = tpe.ErrorLocation;
                     }
                     else if (tfe != null)
                     {
-                        mark = tfe.ErrorLocation;
+                        location = tfe.ErrorLocation;
                     }
 
 					// If we started showing content file errors, keep going... 
-                    if (mark.HasValue)
+                    if (location.HasValue && location != TextLocation.None)
                     {
-                        // TODO: Need to add "&& mark.Value != TextLocation.None" here and show just file
-                        WriteErrorWithLine(ContentPath, mark.Value.Line, mark.Value.Column, e.Message);
+                        WriteErrorWithLine(location.Value, e.Message);
                     }
 					else
 						ConsoleUtility.WriteMessage(MessageType.Error, e.Message);
 #if DEBUG
 					// Gotta have this in debug builds
-					Console.WriteLine(e.StackTrace);
+					WriteMessage(e.StackTrace);
 #endif
 				}
 				while ((e = e.InnerException) != null);
@@ -167,9 +166,14 @@ namespace Vacuum
 
         #region Private Methods
 
-        private void WriteErrorWithLine(string fileName, int line, int column, string message)
+        private void WriteErrorWithLine(TextLocation location, string message)
         {
-            ConsoleUtility.WriteMessage(MessageType.Error, "{0}({1},{2}): {3}", fileName, line, column, message);
+            ConsoleUtility.WriteMessage(MessageType.Error, "{0}({1},{2}): {3}", this.ContentPath, location.Line, location.Column, message);
+        }
+
+        private void WriteWarningWithLine(TextLocation location, string message)
+        {
+            ConsoleUtility.WriteMessage(MessageType.Warning, "{0}({1},{2}): {3}", this.ContentPath, location.Line, location.Column, message);
         }
 
 		private void CreateContentFileFromTemplate()
@@ -186,77 +190,73 @@ namespace Vacuum
 
 		private void WriteContentFilterUsage()
 		{
-			foreach (var filterClass in vacuumContext.FilterClasses)
+			foreach (var filterClass in context.FilterClasses)
 			{
-				Console.WriteLine("\nFilter '{0}':", filterClass.Name);
+				WriteMessage("\nFilter '{0}':", filterClass.Name);
 
-				Console.WriteLine("  Extensions:");
+				WriteMessage("  Extensions:");
 
 				if (filterClass.Extensions.Count == 0)
 				{
-					Console.WriteLine ("    None");
+					WriteMessage ("    None");
 					continue;
 				}
 
 				foreach (var extension in filterClass.Extensions)
 				{
-					Console.WriteLine("    {0} -> {1}", extension.Input, extension.Output);
+					WriteMessage("    {0} -> {1}", extension.Input, extension.Output);
 				}
 
 				if (filterClass.FilterParameters.Count > 0)
 				{
-					Console.WriteLine("  Filter Parameters:");
-					WriteParameters(filterClass, filterClass.FilterParameters);
+					WriteMessage("  Filter Parameters:");
+					WriteParameters(filterClass.FilterParameters);
 				}
 
 				if (filterClass.TargetParameters.Count > 0)
 				{
-					Console.WriteLine("  Target Paramaters:");
-					WriteParameters(filterClass, filterClass.TargetParameters);
+					WriteMessage("  Target Paramaters:");
+					WriteParameters(filterClass.TargetParameters);
 				}
 			}
 		}
 
-		private void WriteParameters(FilterClass filterClass, Dictionary<string, AttributedProperty> settings)
-		{
-			foreach (var pair in settings)
-			{
-				string description;
-								
-				if (pair.Value.Attribute.Optional)
-				{
-					string def = filterClass.Type.GetProperty(pair.Key).GetValue(filterClass.Instance, null).ToString();
+        private void WriteParameters(List<AttributedProperty> attrProps)
+        {
+            foreach (var attrProp in attrProps)
+            {
+                var sb = new StringBuilder();
 
-					description = "{0} (optional, default \"{1}\");".CultureFormat(
-						pair.Value.Attribute.Description, def);
-					
-					Console.Write(
-						"    {0,-15}{1,-15}", 
-						pair.Key, 
-						pair.Value.Property.PropertyType.Name);
-				}
-				else
-				{
-					description = "{0} (required)".CultureFormat(pair.Value.Attribute.Description);
-					
-					Console.Write(
-						"    {0,-15}{1,-15}", 
-						pair.Key, 
-						pair.Value.Property.PropertyType.Name);
-				}
-				
-				int indent = 4 + 15 + 15;
-				string[] lines = description.WordWrap(79 - indent);
-				int i = 0;
-				
-				Console.WriteLine(lines[i++]);
-				
-				for (; i < lines.Length; i++)
-				{
-					Console.WriteLine(new String(' ', indent) + lines[i]);
-				}
-			}
-		}
+                sb.AppendFormat("{0} (", attrProp.Attribute.Description);
+
+                if (!attrProp.Attribute.Required)
+                {
+                    sb.AppendFormat("optional, default=\"{0}\")", attrProp.Attribute.Default);
+                }
+                else
+                {
+                    sb.Append("required)");
+                }
+
+                var description = sb.ToString();
+
+                WriteMessage(
+                    "    {0,-15}{1,-15}", 
+                    attrProp.PropInfo.Name, 
+                    attrProp.PropInfo.PropertyType.Name);
+
+                int indent = 4 + 15 + 15;
+                string[] lines = description.WordWrap(79 - indent);
+                int i = 0;
+
+                WriteMessage(lines[i++]);
+
+                for (; i < lines.Length; i++)
+                {
+                    WriteMessage(new String(' ', indent) + lines[i]);
+                }
+            }
+        }
 
 		private void WriteProperties(PropertyCollection properties)
 		{
@@ -272,11 +272,11 @@ namespace Vacuum
 		{
 			vacuumTargets = new List<VacuumTarget>();
 			
-			foreach (var rawTarget in vacuumContext.ContentFile.Targets)
+			foreach (var rawTarget in context.ContentFile.Targets)
 			{
 				try
 				{
-					vacuumTargets.Add(new VacuumTarget(rawTarget, vacuumContext));
+					vacuumTargets.Add(new VacuumTarget(rawTarget, context));
 				}
 				catch (Exception e)
 				{
@@ -374,155 +374,187 @@ namespace Vacuum
 			return orderedTargets;
 		}
 
-		private void ApplyFilterSettingsExtensions()
+		private void ApplyFilterSettings()
 		{
-			foreach (var filterClass in vacuumContext.FilterClasses)
+			foreach (var filterClass in context.FilterClasses)
 			{
-				// Get the compiler setup entry for this compiler if there is one
-                var compilerSetting = vacuumContext.ContentFile.FilterSettings.FirstOrDefault(s => filterClass.Name.EndsWith(s.Name.Value));
+                var filterSettings = context.ContentFile.FilterSettings.FirstOrDefault(s => filterClass.Name.EndsWith(s.Name.Value));
 				
 				// If there are extensions in the settings try and set the Extensions property
-				if (compilerSetting == null || compilerSetting.Extensions.Count == 0)
-				{
-					if (filterClass.ExtensionsProperty.CanWrite)
-						throw new ContentFileException(compilerSetting.Token.Location, "Filter '{0}' expects Extensions and none are set".CultureFormat(filterClass.Name));
-					else
-						continue;
-				} 
+				if (filterSettings == null)
+                {
+                    ApplyFilterParameters(filterClass, null, context.ContentFile);
+                    continue;
+                }
 
-				if (!filterClass.ExtensionsProperty.CanWrite)
-				{
-					throw new ContentFileException(compilerSetting.Name, "Unable to write to Extensions property of '{0}' compiler".CultureFormat(filterClass.Name));
-				}
-				
-				try
-				{
-					List<FilterExtension> extensions = new List<FilterExtension>();
-					
-                    for (int i = 0; i < compilerSetting.Extensions.Count; i++)
-					{
-                        var extensionsNode = compilerSetting.Extensions[i];
+                if (filterSettings.Extensions != null)
+                {
+    				List<FilterExtension> extensions = new List<FilterExtension>();
 
-						extensions.Add(new FilterExtension(extensionsNode.Inputs, extensionsNode.Outputs));
-					}
-					
-					filterClass.ExtensionsProperty.SetValue(filterClass.Instance, extensions, null);
-				}
-				catch (Exception)
-				{
-					throw new ContentFileException(compilerSetting.Name, "Invalid compiler extensions specified for '{0}' compiler".CultureFormat(filterClass.Name));
-				}
-			}
+                    for (int i = 0; i < filterSettings.Extensions.Count; i++)
+    				{
+                        var extensionsNode = filterSettings.Extensions[i];
+
+    					extensions.Add(new FilterExtension(extensionsNode.Inputs, extensionsNode.Outputs));
+
+                        try
+                        {
+                            filterClass.ExtensionsProperty.SetValue(filterClass.Instance, extensions, null);
+                        }
+                        catch (Exception)
+                        {
+                            throw new ContentFileException(filterSettings.Name, "Invalid extension values specified for '{0}' filter".CultureFormat(filterClass.Name));
+                        }
+    				}
+                }
+
+                ApplyFilterParameters(filterClass, filterSettings.Parameters, filterSettings);
+            }
 		}
 		
-		private void ApplyFilterSettingsParameters()
+        private void ApplyFilterParameters(FilterClass filterClass, TsonObjectNode parameterNode, TsonNode parentNode)
 		{
-			foreach (var filterClass in vacuumContext.FilterClasses)
-			{
-				// Get the compiler setup entry for this compiler if there is one
-				var rawFilterSettings = vacuumContext.ContentFile.FilterSettings.FirstOrDefault(s => filterClass.Name.EndsWith(s.Name.Value));
-
-				ApplyParameters(
-					rawFilterSettings.Name, 
-					filterClass.Name, 
-					filterClass.Instance, 
-					filterClass.FilterParameters, 
-					rawFilterSettings.Parameters);
-			}
-		}
-		
-		private void ApplyParameters(
-			TsonNode parentNode, 
-			string compilerName, 
-			object instance, 
-			Dictionary<string, AttributedProperty> attrProps, 
-			TsonObjectNode parameterNode)
-		{
-			HashSet<string> required = 
-				new HashSet<string>(
-					from s in attrProps
-					where s.Value.Attribute.Optional == false
-					select s.Key);
+            var required = new HashSet<string>();
 			
+            // Set gather required parameters and set default values for all optional parameters
+            foreach (var attrProp in filterClass.FilterParameters)
+            {
+                if (attrProp.Attribute.Required)
+                    required.Add(attrProp.PropInfo.Name);
+                else
+                    attrProp.PropInfo.SetValue(filterClass.Instance, attrProp.Attribute.Default);
+            }
+
             if (parameterNode != null)
             {
                 foreach (var keyValue in parameterNode)
     			{
     				var keyNode = keyValue.Key;
     				var valueNode = keyValue.Value;
-    				AttributedProperty attrProp;
-    				
-                    attrProps.TryGetValue(keyNode.Value, out attrProp);
+    				var attrProp = filterClass.FilterParameters.Find(p => p.PropInfo.Name == keyNode.Value);
     				
     				if (attrProp == null)
     				{
-    					WriteWarning("Supplied parameter '{0}' is not applicable to the '{1}' compiler".CultureFormat(keyNode.Value, compilerName));
+                        WriteWarningWithLine(parameterNode.Token.Location, "Supplied filter parameter '{0}' is not applicable to the '{1}' filter".CultureFormat(keyNode.Value, filterClass.Name));
     					continue;
     				}
-    				
-    				PropertyInfo propertyInfo = attrProp.Property;
-    				
-    				if (!propertyInfo.CanWrite)
-                        throw new ContentFileException(parentNode, "Unable to write to the '{0}' property of '{1}' compiler".CultureFormat(keyNode.Value, compilerName));
-    				
-    				object obj = null;
 
-                    if (propertyInfo.PropertyType == typeof(double))
-                    {
-                        var numberNode = valueNode as TsonNumberNode;
+                    if (!attrProp.PropInfo.CanWrite)
+                        throw new ContentFileException(parameterNode, "Unable to write to the '{0}' property of '{1}'".CultureFormat(keyNode.Value, filterClass.Name));
 
-                        if (numberNode == null)
-                            throw new ContentFileException(valueNode, "TSON node for '{0}' is not a number".CultureFormat(keyNode.Value));
+                    object obj = GetParameterValueFromTsonNode(attrProp.PropInfo.PropertyType, valueNode);
 
-                        obj = numberNode.Value;
-                    }
-                    else if (propertyInfo.PropertyType == typeof(int))
-                    {
-                        var numberNode = valueNode as TsonNumberNode;
-
-                        if (numberNode == null)
-                            throw new ContentFileException(valueNode, "TSON node for '{0}' is not a number".CultureFormat(keyNode.Value));
-
-                        obj = (object)(int)numberNode.Value;
-                    }
-                    else if (propertyInfo.PropertyType == typeof(string))
-                    {
-                        var numberNode = valueNode as TsonStringNode;
-
-                        if (numberNode == null)
-                            throw new ContentFileException(valueNode, "TSON node for '{0}' is not a string".CultureFormat(keyNode.Value));
-
-                        obj = numberNode.Value;
-                    }
-                    else if (propertyInfo.PropertyType == typeof(bool))
-                    {
-                        obj = ((TsonBooleanNode)valueNode).Value;
-                    }
-    				else
+                    if (obj == null)
     				{
     					throw new ContentFileException(
     						parameterNode, 
-                            "Setting '{0}' parameter for compiler '{1}' must be bool, int, double or string".CultureFormat(keyNode.Value, compilerName));
+                            "Filter parameter '{0}' for filter '{1}' must be bool, int, double or string".CultureFormat(keyNode.Value, filterClass.Name));
     				}
-    				
-    				try
-    				{
-    					propertyInfo.SetValue(instance, obj, null);
-    				}
-    				catch (Exception e)
-    				{
-    					throw new ContentFileException(keyValue.Key, "Error setting compiler property", e);
-    				}
-    				
-    				required.Remove(keyNode.Value);
-    			}
+
+                    attrProp.PropInfo.SetValue(filterClass.Instance, obj, null);
+
+                    required.Remove(attrProp.PropInfo.Name);
+                }
             }
 
-			if (required.Count != 0)
-				throw new ContentFileException(
-					parentNode, 
-					"Required parameter '{0}' of compiler '{1}' was not set".CultureFormat(required.First(), compilerName));
+            if (required.Count != 0)
+                throw new ContentFileException(
+                    parameterNode == null ? parentNode : parameterNode, 
+                    "Required filter parameter '{0}' of filter '{1}' was not set".CultureFormat(required.First(), filterClass.Name));
 		}
+
+        private void ApplyTargetParameters(FilterClass filterClass, TsonObjectNode parameterNode, TsonNode targetNode)
+        {
+            var required = new HashSet<string>();
+
+            // Set gather required parameters and set default values for all optional parameters
+            foreach (var attrProp in filterClass.TargetParameters)
+            {
+                if (attrProp.Attribute.Required)
+                    required.Add(attrProp.PropInfo.Name);
+                else
+                    attrProp.PropInfo.SetValue(filterClass.Instance, attrProp.Attribute.Default);
+            }
+
+            if (parameterNode != null)
+            {
+                foreach (var keyValue in parameterNode)
+                {
+                    var keyNode = keyValue.Key;
+                    var valueNode = keyValue.Value;
+                    var attrProp = filterClass.TargetParameters.Find(p => p.PropInfo.Name == keyNode.Value);
+
+                    if (attrProp == null)
+                    {
+                        WriteWarningWithLine(parameterNode.Token.Location, "Supplied target parameter '{0}' is not applicable to the '{1}' filter".CultureFormat(keyNode.Value, filterClass.Name));
+                        continue;
+                    }
+
+                    if (!attrProp.PropInfo.CanWrite)
+                        throw new ContentFileException(parameterNode, "Unable to write to the '{0}' property of '{1}'".CultureFormat(keyNode.Value, filterClass.Name));
+
+                    object obj = GetParameterValueFromTsonNode(attrProp.PropInfo.PropertyType, valueNode);
+
+                    if (obj == null)
+                    {
+                        throw new ContentFileException(
+                            parameterNode, 
+                            "Target parameter '{0}' for filter '{1}' must be bool, int, double or string".CultureFormat(keyNode.Value, filterClass.Name));
+                    }
+
+                    attrProp.PropInfo.SetValue(filterClass.Instance, obj, null);
+
+                    required.Remove(attrProp.PropInfo.Name);
+                }
+            }
+
+            if (required.Count != 0)
+                throw new ContentFileException(
+                    parameterNode == null ? targetNode : parameterNode, 
+                    "Required target parameter '{0}' of filter '{1}' was not set".CultureFormat(required.First(), filterClass.Name));
+        }
+
+        private object GetParameterValueFromTsonNode(Type propertyType, TsonNode valueNode)
+        {
+            if (propertyType == typeof(double))
+            {
+                var numberNode = valueNode as TsonNumberNode;
+
+                if (numberNode == null)
+                    throw new ContentFileException(valueNode, "Value is not a number");
+
+                return numberNode.Value;
+            }
+            else if (propertyType == typeof(int))
+            {
+                var numberNode = valueNode as TsonNumberNode;
+
+                if (numberNode == null)
+                    throw new ContentFileException(valueNode, "Value is not a number");
+
+                return (object)(int)numberNode.Value;
+            }
+            else if (propertyType == typeof(string))
+            {
+                var numberNode = valueNode as TsonStringNode;
+
+                if (numberNode == null)
+                    throw new ContentFileException(valueNode, "Value is not a string");
+
+                return numberNode.Value;
+            }
+            else if (propertyType == typeof(bool))
+            {
+                var boolNode = valueNode as TsonBooleanNode;
+
+                if (boolNode == null)
+                    throw new ContentFileException(valueNode, "Value is not boolean");
+
+                return boolNode.Value;
+            }
+            else
+                return null;
+        }
 
 		private void Clean(List<VacuumTarget> vacuumTargets)
 		{
@@ -540,7 +572,7 @@ namespace Vacuum
 				}
 			}
 
-			string hashPath = vacuumContext.ContentFileHashesPath;
+			string hashPath = context.ContentFileHashesPath;
 
 			if (File.Exists(hashPath))
 			{
@@ -558,7 +590,7 @@ namespace Vacuum
 
 			if (ShowProperties)
 			{
-				WriteProperties(vacuumContext.Properties);
+				WriteProperties(context.Properties);
 			}
 
 			foreach (var buildTarget in vacuumTargets)
@@ -571,11 +603,11 @@ namespace Vacuum
 					}
 				}
 
-				if (!IsCompileRequired(buildTarget, oldGlobalHash, oldTargetHashes))
+				if (!IsFilteringRequired(buildTarget, oldGlobalHash, oldTargetHashes))
 					continue;
 
 				FilterClass filterClass = buildTarget.FilterClass;
-				string msg = String.Format("Vacuuming target '{0}' with '{1}' compiler", buildTarget.Name, filterClass.Name);
+				string msg = String.Format("Vacuuming target '{0}' with '{1}' filter", buildTarget.Name, filterClass.Name);
 
 				foreach (var input in buildTarget.InputPaths)
 				{
@@ -594,25 +626,20 @@ namespace Vacuum
 				}
 
 				// Set the Context and Target properties on the Filter class instance
-				filterClass.ContextProperty.SetValue(filterClass.Instance, vacuumContext, null);
+				filterClass.ContextProperty.SetValue(filterClass.Instance, context, null);
 				filterClass.TargetProperty.SetValue(filterClass.Instance, buildTarget, null);
 
-				// Set all target properties
-				ApplyParameters(
-					buildTarget.TargetNode.Name, 
-					filterClass.Name,
-					filterClass.Instance,
-					filterClass.TargetParameters, 
-					buildTarget.TargetNode.Parameters);
+				// Set target parameters
+                ApplyTargetParameters(filterClass, buildTarget.TargetNode.Parameters, buildTarget.TargetNode);
 
 				try
 				{
-					filterClass.CompileMethod.Invoke(filterClass.Instance, null);
+					filterClass.FilterMethod.Invoke(filterClass.Instance, null);
 				}
 				catch (TargetInvocationException e)
 				{
 					throw new ContentFileException(
-						buildTarget.TargetNode.Name, "Unable to compile target '{0}'".CultureFormat(buildTarget.Name), e.InnerException);
+						buildTarget.TargetNode.Name, "Unable to filter target '{0}'".CultureFormat(buildTarget.Name), e.InnerException);
 				}
 
 				// Ensure that the output files were generated
@@ -634,12 +661,12 @@ namespace Vacuum
 			oldGlobalHash = String.Empty;
 			oldTargetHashes = new HashSet<string>();
 
-			if (File.Exists(vacuumContext.ContentFileHashesPath))
+			if (File.Exists(context.ContentFileHashesPath))
 			{
 				try
 				{
                     var hashes = Tson.ToObjectNode<ContentFileHashesFile>(
-                        File.ReadAllText(vacuumContext.ContentFileHashesPath));
+                        File.ReadAllText(context.ContentFileHashesPath));
 					
 					oldGlobalHash = hashes.Global.Value;
 
@@ -651,7 +678,7 @@ namespace Vacuum
 				catch
 				{
 					// Bad file, don't use it again
-					File.Delete(vacuumContext.ContentFileHashesPath);
+					File.Delete(context.ContentFileHashesPath);
 				}
 			}
 		}
@@ -660,7 +687,7 @@ namespace Vacuum
 		{
             ContentFileHashesFile hashesFile = new ContentFileHashesFile()
 			{
-                Global = new TsonStringNode(vacuumContext.GlobalHash),
+                Global = new TsonStringNode(context.GlobalHash),
                 Targets = new TsonArrayNode<TsonStringNode>(vacuumTargets.Select(t => new TsonStringNode(t.Hash)))
 			};
 
@@ -668,21 +695,21 @@ namespace Vacuum
 			{
                 var tson = Tson.Format(hashesFile, TsonFormatStyle.Compact);
 				
-                File.WriteAllText(vacuumContext.ContentFileHashesPath, tson);
+                File.WriteAllText(context.ContentFileHashesPath, tson);
 			}
 			catch
 			{
-				WriteWarning("Unable to write content hash file '{0}'".CultureFormat(vacuumContext.ContentFileHashesPath));
+				WriteWarning("Unable to write content hash file '{0}'".CultureFormat(context.ContentFileHashesPath));
 			}
 		}
 
-		private bool IsCompileRequired(VacuumTarget buildTarget, string oldGlobalHash, HashSet<string> oldTargetHashes)
+		private bool IsFilteringRequired(VacuumTarget buildTarget, string oldGlobalHash, HashSet<string> oldTargetHashes)
 		{
 			if (this.Force)
 				return true;
 
 			DateTime lastWriteTime;
-			DateTime newestInputFile = vacuumContext.NewestAssemblyWriteTime;
+			DateTime newestInputFile = context.NewestAssemblyWriteTime;
 
 			foreach (var inputPath in buildTarget.InputPaths)
 			{
@@ -706,10 +733,10 @@ namespace Vacuum
 			// is not present in the hash file then the definition changed or was added,
 			// OR if the global hash has changed then consider the content file write time.
 
-			if (vacuumContext.ContentFileWriteTime > newestInputFile && 
-				(oldGlobalHash != vacuumContext.GlobalHash || !oldTargetHashes.Contains(buildTarget.Hash)))
+			if (context.ContentFileWriteTime > newestInputFile && 
+				(oldGlobalHash != context.GlobalHash || !oldTargetHashes.Contains(buildTarget.Hash)))
 			{
-				newestInputFile = vacuumContext.ContentFileWriteTime;
+				newestInputFile = context.ContentFileWriteTime;
 			}
 
 			return newestInputFile > oldestOutputFile;

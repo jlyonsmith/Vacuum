@@ -74,11 +74,11 @@
     <Compile Include="VacuumTool.cs" />
     <Compile Include="VacuumContext.cs" />
     <Compile Include="VacuumTarget.cs" />
-    <Compile Include="ContentFilterParameterAttribute.cs" />
-    <Compile Include="IContentFilter.cs" />
     <Compile Include="FilterExtension.cs" />
     <Compile Include="FilterClass.cs" />
     <Compile Include="Resources\VacuumResources.cs" />
+    <Compile Include="IFilter.cs" />
+    <Compile Include="ParameterAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

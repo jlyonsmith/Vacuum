@@ -11,21 +11,18 @@ namespace Vacuum
 {
 	internal class AttributedProperty
 	{
-		public AttributedProperty(ContentFilterParameterAttribute attribute, PropertyInfo property)
+		public AttributedProperty(ParameterAttribute attribute, PropertyInfo propInfo)
 		{
 			this.Attribute = attribute;
-			this.Property = property;
+			this.PropInfo = propInfo;
 		}
 		
-		public ContentFilterParameterAttribute Attribute;
-		public PropertyInfo Property;
+        public ParameterAttribute Attribute;
+		public PropertyInfo PropInfo;
 	}
 
 	public class FilterClass
     {
-		private Dictionary<string, AttributedProperty> compilerParameters;
-		private Dictionary<string, AttributedProperty> targetParameters;
-
 		internal FilterClass(TsonStringNode assemblyNode, Assembly assembly, Type type, Type interfaceType)
 		{
 			this.Assembly = assembly;
@@ -33,8 +30,8 @@ namespace Vacuum
 			this.Interface = interfaceType;
 			this.Instance = Activator.CreateInstance(this.Type);
 
-			compilerParameters = new Dictionary<string, AttributedProperty>();
-			targetParameters = new Dictionary<string, AttributedProperty>();
+			this.FilterParameters = new List<AttributedProperty>();
+			this.TargetParameters = new List<AttributedProperty>();
 
 			foreach (PropertyInfo propertyInfo in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
 			{
@@ -52,24 +49,29 @@ namespace Vacuum
 				}
 				else
 				{
-					object[] attributes = propertyInfo.GetCustomAttributes(typeof(ContentFilterParameterAttribute), true);
-					ContentFilterParameterAttribute attribute;
-				
-					if (attributes.Length == 1)
-						attribute = (ContentFilterParameterAttribute)attributes[0];
-					else
-						continue;
+                    var filterAttrs = propertyInfo.GetCustomAttributes<FilterParameterAttribute>(true);
+					
+                    if (filterAttrs.Count() > 0)
+                    {
+    					if (!(propertyInfo.CanRead && propertyInfo.CanWrite))
+    						throw new ContentFileException(
+    							assemblyNode, "Filter property '{0}' on '{1}' filter must be read/write".CultureFormat(propertyInfo.Name, this.Name));
 
-					if (!(propertyInfo.CanRead && propertyInfo.CanWrite))
-						throw new ContentFileException(
-							assemblyNode, "Settings property '{0}' on '{1}' compiler must be read/write".CultureFormat(propertyInfo.Name, this.Name));
+                        this.FilterParameters.Add(new AttributedProperty(filterAttrs.First(), propertyInfo));
+                    }
+                    else
+                    {
+                        var targetAttrs = propertyInfo.GetCustomAttributes<TargetParameterAttribute>(true);
 
-					var property = new AttributedProperty(attribute, propertyInfo);
+                        if (targetAttrs.Count() > 0)
+                        {
+                            if (!(propertyInfo.CanRead && propertyInfo.CanWrite))
+                                throw new ContentFileException(
+                                    assemblyNode, "Target property '{0}' on '{1}' filter must be read/write".CultureFormat(propertyInfo.Name, this.Name));
 
-					if (attribute.ForFilter)
-						compilerParameters.Add(propertyInfo.Name, property);
-					else
-						targetParameters.Add(propertyInfo.Name, property);
+                            this.TargetParameters.Add(new AttributedProperty(targetAttrs.First(), propertyInfo));
+                        }
+                    }
 				}
 			}
 		}
@@ -80,12 +82,11 @@ namespace Vacuum
 		public IList<FilterExtension> Extensions { get { return (IList<FilterExtension>)Interface.GetProperty("Extensions").GetValue(this.Instance, null); } }
 		internal Type Interface { get; private set; }
 		internal Object Instance { get; private set; }
-		internal MethodInfo CompileMethod { get { return Interface.GetMethod("Compile"); } }
-		internal MethodInfo SettingsMethod { get { return Interface.GetMethod("Setup"); } }
+		internal MethodInfo FilterMethod { get { return Interface.GetMethod("Filter"); } }
 		internal PropertyInfo ContextProperty { get; private set; }
 		internal PropertyInfo TargetProperty { get; private set; }
 		internal PropertyInfo ExtensionsProperty { get; private set; }
-		internal Dictionary<string, AttributedProperty> FilterParameters { get { return compilerParameters; } }
-		internal Dictionary<string, AttributedProperty> TargetParameters { get { return targetParameters; } }
+        internal List<AttributedProperty> FilterParameters { get; set; }
+        internal List<AttributedProperty> TargetParameters { get; set; }
 	}
 }

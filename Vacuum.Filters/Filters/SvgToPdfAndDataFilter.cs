@@ -10,44 +10,34 @@ using Vacuum;
 
 namespace Vacuum.Filters
 {
-	public class SvgToPdfAndDataFilter : IContentFilter
+	public class SvgToPdfAndDataFilter : FilterBase
     {
-		#region Construction
-		public SvgToPdfAndDataFilter()
-		{
-			Rows = 1;
-			Columns = 1;
-		}
-		#endregion
-
-		#region Fields
-		private FilterExtension[] extensions = new FilterExtension[]
-		{
-			new FilterExtension(".svg", ".pdf:.data")
-		};
-		#endregion 
+        public SvgToPdfAndDataFilter()
+        {
+            this.Extensions = new FilterExtension[]
+            {
+                new FilterExtension(".svg", ".pdf:.data")
+            };
+        }
 
 		#region Properties
-		[ContentFilterParameter("Number of rows of images. Used for compound images.", Optional = true)]
+        [TargetParameter("Number of rows of images. Used for compound images.", Default = (object)1)]
 		public int Rows { get; set; }
 		
-		[ContentFilterParameter("Number of columns of images.  Used for compound images", Optional = true)]
+        [TargetParameter("Number of columns of images.  Used for compound images", Default = (object)1)]
 		public int Columns { get; set; }
 		
-		[ContentFilterParameter("Name of the pinboard to use for the rectangle")]
+		[TargetParameter("Name of the pinboard to use for the rectangle")]
 		public string Pinboard { get; set; }
 		
-		[ContentFilterParameter("Name of the rectangle to use to size the image")]
+		[TargetParameter("Name of the rectangle to use to size the image")]
 		public string Rectangle { get; set; }
 
 		#endregion
 
-		#region IContentFilter
-		public IList<FilterExtension> Extensions { get { return extensions; } }
-		public VacuumContext Context { get; set; }
-        public VacuumTarget Target { get; set; }
+		#region IFilter
 
-		public void Compile()
+        public override void Filter()
 		{
 			IEnumerable<ParsedPath> svgPaths = Target.InputPaths.Where(f => f.Extension == ".svg");
 			ParsedPath pdfPath = Target.OutputPaths.Where(f => f.Extension == ".pdf").First();

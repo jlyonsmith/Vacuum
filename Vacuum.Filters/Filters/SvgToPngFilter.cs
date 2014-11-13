@@ -7,35 +7,29 @@ using Vacuum;
 
 namespace Vacuum.Filters
 {
-	public class SvgToPngFilter : IContentFilter
+	public class SvgToPngFilter : FilterBase
 	{
 		#region Construction
 		public SvgToPngFilter()
 		{
+            this.Extensions = new FilterExtension[]
+            {
+                new FilterExtension(".svg", ".png")
+            };
 		}
 		#endregion
 
-		#region Fields
-		private FilterExtension[] extensions = new FilterExtension[]
-		{
-			new FilterExtension(".svg", ".png")
-		};
-		#endregion 
-		
 		#region Properties
-		[ContentFilterParameter("Width of the bitmap in pixels", Optional = false)]
+		[TargetParameter("Width of the bitmap in pixels")]
 		public double Width { get; set; }
 		
-		[ContentFilterParameter("Height of the bitmap in pixels", Optional = false)]
+		[TargetParameter("Height of the bitmap in pixels")]
 		public double Height { get; set; }
 		#endregion
 		
-		#region IContentFilter
-		public IList<FilterExtension> Extensions { get { return extensions; } }
-		public VacuumContext Context { get; set; }
-		public VacuumTarget Target { get; set; }
+		#region IFilter
 
-		public void Compile()
+        public override void Filter()
 		{
 			ParsedPath svgFileName = Target.InputPaths.Where(f => f.Extension == ".svg").First();
 			ParsedPath pngFileName = Target.OutputPaths.Where(f => f.Extension == ".png").First();

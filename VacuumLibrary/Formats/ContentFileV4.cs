@@ -20,7 +20,7 @@ namespace Vacuum
             public TsonObjectNode Parameters { get; set; }
         }
 
-		public class FilterSetting : TsonTypedObjectNode
+        public class FilterSetting : TsonTypedObjectNode
 		{
             [TsonNotNull]
             public TsonStringNode Name { get; set; }

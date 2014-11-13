@@ -142,12 +142,12 @@ namespace Vacuum
 				if (this.FilterClass == null)
 				{
 					throw new ArgumentException(
-						"No compiler found for target '{0}' handling extensions '{1}'".CultureFormat(this.Name, this.Extension.ToString()));
+						"No filter found for target '{0}' handling extensions '{1}'".CultureFormat(this.Name, this.Extension.ToString()));
 				}
 			}
 			else
 			{
-				// Search for the compiler based on the supplied name and validate it handles the extensions
+				// Search for the filter based on the supplied name and validate it handles the extensions
 				foreach (var filterClass in vacuumContext.FilterClasses)
 				{
 					if (filterClass.Name.EndsWith(TargetNode.Filter.Value, StringComparison.OrdinalIgnoreCase))
@@ -158,7 +158,7 @@ namespace Vacuum
 				}
 
 				if (this.FilterClass == null)
-					throw new ArgumentException("Supplied compiler '{0}' was not found".CultureFormat(TargetNode.Filter));
+					throw new ArgumentException("Supplied filter '{0}' was not found".CultureFormat(TargetNode.Filter));
 			}
 
 			SHA1 sha1 = SHA1.Create();

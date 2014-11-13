@@ -11,21 +11,19 @@ using Vacuum;
 
 namespace Vacuum.Filters
 {
-    public class PinboardToDataFilter : IContentFilter
+    public class PinboardToDataFilter : FilterBase
     {
-		#region Fields
-		private FilterExtension[] extensions = new FilterExtension[]
-		{
-			new FilterExtension(".pinboard", ".data")
-		};
-		#endregion 
-		
-		#region IContentFilter
-		public IList<FilterExtension> Extensions { get { return extensions; } }
-		public VacuumContext Context { get; set; }
-        public VacuumTarget Target { get; set; }
+        public PinboardToDataFilter()
+        {
+            this.Extensions = new FilterExtension[]
+            {
+                new FilterExtension(".pinboard", ".data")
+            };
+        }
 
-		public void Compile()
+		#region IFilter
+
+        public override void Filter()
 		{
 			if (Target.InputPaths.Count != 1)
 				throw new ContentFileException(Target.TargetNode.Name, "One input file expected");

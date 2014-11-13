@@ -10,8 +10,16 @@ using Vacuum;
 
 namespace Vacuum.Filters
 {
-    public class StringsToDataAndCsFilter : IContentFilter
+    public class StringsToDataAndCsFilter : FilterBase
     {
+        public StringsToDataAndCsFilter()
+        {
+            this.Extensions = new FilterExtension[]
+            {
+                new FilterExtension(".strings", ".data:.cs")
+            };
+        }
+
         #region Classes
         class StringsContent
         {
@@ -29,35 +37,18 @@ namespace Vacuum.Filters
 
         #endregion
 
-		#region Fields
-		private FilterExtension[] extensions = new FilterExtension[]
-		{
-			new FilterExtension(".strings", ".data:.cs")
-		};
-		#endregion 
-
 		#region Properties
-		[ContentFilterParameter("Class name for the generated C# file.  Xxx will be replaced with the base file name of the input strings file.", Optional = true)]
+		[TargetParameter("Class name for the generated C# file.  Xxx will be replaced with the base file name of the input strings file.", 
+            Default="XxxStrings")]
 		public string ClassName { get; set; }
 
-		[ContentFilterParameter("Namespace for the generated C# file.", Optional = false)]
+		[TargetParameter("Namespace for the generated C# file.")]
 		public string Namespace { get; set; }
 		#endregion
 
-		#region Construction
-		public StringsToDataAndCsFilter()
-		{
-			ClassName = "XxxStrings";
-		}
+		#region IFilter
 
-		#endregion
-		
-		#region IContentFilter
-		public IList<FilterExtension> Extensions { get { return extensions; } }
-		public VacuumContext Context { get; set; }
-        public VacuumTarget Target { get; set; }
-
-		public void Compile()
+        public override void Filter()
 		{
 			if (Target.InputPaths.Count != 1)
 				throw new ContentFileException("Only one input file expected");

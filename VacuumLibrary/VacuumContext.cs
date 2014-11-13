@@ -73,11 +73,11 @@ namespace Vacuum
 				sb.Append(propertyNode.Name.Value);
 				sb.Append(propertyNode.Value.Value);
 			}
-            foreach (var compilerSettingsNode in this.ContentFile.FilterSettings)
+            foreach (var filterSettingsNode in this.ContentFile.FilterSettings)
 			{
-				sb.Append(compilerSettingsNode.Name);
+				sb.Append(filterSettingsNode.Name);
 
-				foreach (var extension in compilerSettingsNode.Extensions)
+				foreach (var extension in filterSettingsNode.Extensions)
 				{
                     foreach (var input in extension.Inputs)
                         sb.Append(input.Value);
@@ -86,9 +86,9 @@ namespace Vacuum
                         sb.Append(output.Value);
 				}
 
-                if (compilerSettingsNode.Parameters != null)
+                if (filterSettingsNode.Parameters != null)
                 {
-                    foreach (var keyValue in compilerSettingsNode.Parameters)
+                    foreach (var keyValue in filterSettingsNode.Parameters)
     				{
     					sb.Append(keyValue.Key.Value);
                         sb.Append(keyValue.Value.ToString());
@@ -173,25 +173,28 @@ namespace Vacuum
 					foreach (Exception ex in e.LoaderExceptions)
 						message += Environment.NewLine + "   " + ex.Message;
 					
-					// Not being able to reflect on classes in the compiler assembly is a critical error
+					// Not being able to reflect on classes in the filter assembly is a critical error
 					throw new ContentFileException(this.ContentFile.FilterAssemblies[i], message, e);
 				}
 				
-				int compilerCount = 0;
-				
+                int filterCount = 0;
+
 				// Go through all the types in the test assembly and find all the 
-				// compiler classes, those that inherit from IContentFilter.
+				// filter classes, those that inherit from IFilter.
 				foreach (var type in types)
 				{
-					Type interfaceType = type.GetInterface(typeof(IContentFilter).ToString());
+                    if (type.IsAbstract)
+                        continue;
+
+					Type interfaceType = type.GetInterface(typeof(IFilter).ToString());
 					
-					if (interfaceType == null)
+                    if (interfaceType == null)
 						continue;
 
 					FilterClass filterClass = new FilterClass(this.ContentFile.FilterAssemblies[i], assembly, type, interfaceType);
 						
 					FilterClasses.Add(filterClass);
-					compilerCount++;
+					filterCount++;
 				}
 
 				DateTime dateTime = File.GetLastWriteTime(assembly.Location);
@@ -199,7 +202,7 @@ namespace Vacuum
 				if (dateTime > NewestAssemblyWriteTime)
 					NewestAssemblyWriteTime = dateTime;
 
-                WriteMessage("Loaded {0} compilers from assembly '{1}'".CultureFormat(compilerCount, assembly.Location));
+                WriteMessage("Loaded {0} filters from assembly '{1}'".CultureFormat(filterCount, assembly.Location));
 			}
 		}
 	}

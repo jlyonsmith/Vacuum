@@ -8,37 +8,27 @@ using Vacuum;
 
 namespace Vacuum.Filters
 {
-	public class SvgAndPinboardToPngFilter : IContentFilter
+	public class SvgAndPinboardToPngFilter : FilterBase
 	{
-		#region Fields
-		private FilterExtension[] extensions = new FilterExtension[]
-		{
-			new FilterExtension(".svg:.pinboard", ".png")
-		};
-		#endregion 
+        public SvgAndPinboardToPngFilter()
+        {
+            this.Extensions = new FilterExtension[]
+            {
+                new FilterExtension(".svg:.pinboard", ".png")
+            };
+        }
 
 		#region Properties
-		[ContentFilterParameter("List of rectangle names to use to size the SVG files", Optional = false)]
+		[TargetParameter("List of rectangle names to use to size the SVG files")]
 		public string Rectangles { get; set; }
 
-		[ContentFilterParameter("Rotation to apply to the bitmap.  Can be None, Left, Right or UpsideDown", Optional = true)]
+        [TargetParameter("Rotation to apply to the bitmap.  Can be None, Left, Right or UpsideDown", Default = "None")]
 		public string Rotation { get; set; }
 		#endregion
 
-		#region Construction
-		public SvgAndPinboardToPngFilter()
-		{
-			Rotation = "None";
-		}
-		#endregion
+		#region IFilter
 
-		#region IContentFilter
-
-		public IList<FilterExtension> Extensions { get { return extensions; } }
-		public VacuumContext Context { get; set; }
-		public VacuumTarget Target { get; set; }
-
-		public void Compile()
+        public override void Filter()
 		{
 			IEnumerable<ParsedPath> svgPaths = Target.InputPaths.Where(f => f.Extension == ".svg");
 			ParsedPath pinboardPath = Target.InputPaths.Where(f => f.Extension == ".pinboard").First();

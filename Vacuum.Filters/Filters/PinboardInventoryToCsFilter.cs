@@ -9,8 +9,16 @@ using Vacuum;
 
 namespace Vacuum.Filters
 {
-    public class PinboardInventoryToCsFilter : IContentFilter
+    public class PinboardInventoryToCsFilter : FilterBase
     {
+        public PinboardInventoryToCsFilter()
+        {
+            this.Extensions = new FilterExtension[]
+            {
+                new FilterExtension(".pinboard", ".cs")
+            };
+        }
+
         #region Classes
         private class RectanglesContent
         {
@@ -43,31 +51,15 @@ namespace Vacuum.Filters
 
         #endregion
 
-		#region Fields
-		private IList<FilterExtension> extensions = new FilterExtension[]
-		{
-			new FilterExtension(".pinboard", ".cs")
-		};
-		#endregion
-        
 		#region Properties
-		[ContentFilterParameter("Namespace for the generated C# file", Optional = false)]
+		[TargetParameter("Namespace for the generated C# file")]
 		public string Namespace { get; set; }
 
 		#endregion
 
-		#region Construction
-		public PinboardInventoryToCsFilter()
-		{
-		}
-		#endregion
-		
-		#region IContentFilter Members
-        public IList<FilterExtension> Extensions { get { return extensions; } }
-        public VacuumContext Context { get; set; }
-        public VacuumTarget Target { get; set; }
+		#region IFilter
 
-        public void Compile()
+        public override void Filter()
         {
             IEnumerable<ParsedPath> pinboardFileNames = Target.InputPaths.Where(f => f.Extension == ".pinboard");
             IEnumerable<ParsedPath> distinctPinboardFileNames = pinboardFileNames.Distinct<ParsedPath>(new FileNameEqualityComparer());

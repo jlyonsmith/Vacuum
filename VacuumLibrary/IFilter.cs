@@ -6,11 +6,13 @@ using ToolBelt;
 
 namespace Vacuum
 {
-    public interface IContentFilter
+    public interface IFilter
     {
-        IList<FilterExtension> Extensions { get; }
+        IList<FilterExtension> Extensions { get; set; }
         VacuumContext Context { get; set; }
         VacuumTarget Target { get; set; }
-        void Compile();
+        void Setup();
+        void Filter();
+        void CleanUp();
     }
 }

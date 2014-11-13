@@ -7,15 +7,11 @@ using Vacuum;
 
 namespace Vacuum.Filters
 {
-	public class CopyFilter : IContentFilter 
+	public class CopyFilter : FilterBase 
 	{
-		#region IContentFilter
+		#region IFilter
 		
-		public IList<FilterExtension> Extensions { get; set; }
-		public VacuumContext Context { get; set; }
-		public VacuumTarget Target { get; set; }
-
-		public void Compile()
+		public override void Filter()
 		{
 			IList<ParsedPath> fromPaths = Target.InputPaths;
 			IList<ParsedPath> toPaths = Target.OutputPaths;
