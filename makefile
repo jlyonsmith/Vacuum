@@ -1,7 +1,7 @@
 CONFIG?=Release
 PREFIX?=prefix
 PREFIX:=$(abspath $(PREFIX))
-VERSION=3.0.11111
+VERSION=3.0.11113
 PROJECT=Vacuum
 STAGEDIR=Scratch/Homebrew
 libFiles=$(PROJECT).exe $(PROJECT)Library.dll $(PROJECT).exe.config ToolBelt.dll MsgPack.dll TsonLibrary.dll
