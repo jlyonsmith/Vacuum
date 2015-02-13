@@ -1,5 +1,5 @@
 //
-// This file genenerated by the Buckle tool on 11/26/2012 at 9:05 PM. 
+// This file genenerated by the Buckle tool on 2/13/2015 at 8:27 AM. 
 //
 // Contains strongly typed wrappers for resources in VacuumResources.resx
 //
@@ -22,10 +22,10 @@ public class VacuumResources
     /// <summary>
     /// File '{0}' does not exist
     /// </summary>
-    public static ToolBelt.Message FileNotFound(object param0)
+    public static string FileNotFound(object param0)
     {
-        Object[] o = { param0 };
-        return new ToolBelt.Message("FileNotFound", typeof(VacuumResources), ResourceManager, o);
+        string format = ResourceManager.GetString("FileNotFound", CultureInfo.CurrentUICulture);
+        return string.Format(CultureInfo.CurrentCulture, format, param0);
     }
 }
 }
